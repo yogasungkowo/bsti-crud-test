@@ -1,0 +1,418 @@
+<x-layout.app :title="'Buat Profil Siswa'">
+    @push('styles')
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 40px;
+        }        .form-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .form-header h2 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #f44;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group label .required {
+            color: #f44;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input,
+        .input-wrapper select,
+        .input-wrapper textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .input-wrapper textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .input-wrapper input:focus,
+        .input-wrapper select:focus,
+        .input-wrapper textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-wrapper input.error,
+        .input-wrapper select.error,
+        .input-wrapper textarea.error {
+            border-color: #f44;
+        }
+
+        .input-error {
+            color: #f44;
+            font-size: 13px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .profile-picture-preview {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .preview-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #667eea;
+            margin-bottom: 15px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-label:hover {
+            background: #e0e0e0;
+            border-color: #667eea;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .logout-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .logout-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .logout-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+
+            .form-card {
+                padding: 30px 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    @endpush
+
+    <div class="container">
+        @if(session('info'))
+            <div class="alert alert-info">
+                {{ session('info') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <strong>Terjadi kesalahan:</strong>
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div class="form-card">
+            <div class="form-header">
+                <h2>Buat Profil Siswa</h2>
+                <p>Lengkapi data profil Anda untuk melanjutkan</p>
+            </div>
+
+            <form action="{{ route('student.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+
+                <!-- Profile Picture Preview -->
+                <div class="profile-picture-preview">
+                    <img src="https://ui-avatars.com/api/?name=User&size=150&background=667eea&color=fff" alt="Profile" class="preview-image" id="imagePreview">
+                    
+                    <div class="file-input-wrapper">
+                        <input type="file" id="profile_picture" name="profile_picture" accept="image/*" onchange="previewImage(event)">
+                        <label for="profile_picture" class="file-input-label">
+                            📷 Upload Foto Profil
+                        </label>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                        Format: JPG, PNG, GIF (Max: 2MB)
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Nama Lengkap <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                id="name" 
+                                name="name" 
+                                placeholder="Masukkan nama lengkap"
+                                value="{{ old('name') }}"
+                                class="{{ $errors->has('name') ? 'error' : '' }}"
+                                required
+                            >
+                        </div>
+                        @error('name')
+                            <span class="input-error">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nisn">NISN <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                id="nisn" 
+                                name="nisn" 
+                                placeholder="Nomor Induk Siswa Nasional"
+                                value="{{ old('nisn') }}"
+                                class="{{ $errors->has('nisn') ? 'error' : '' }}"
+                                required
+                            >
+                        </div>
+                        @error('nisn')
+                            <span class="input-error">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="gender">Jenis Kelamin <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <select 
+                                id="gender" 
+                                name="gender" 
+                                class="{{ $errors->has('gender') ? 'error' : '' }}"
+                                required
+                            >
+                                <option value="">Pilih Jenis Kelamin</option>
+                                <option value="laki-laki" {{ old('gender') == 'laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                <option value="perempuan" {{ old('gender') == 'perempuan' ? 'selected' : '' }}>Perempuan</option>
+                            </select>
+                        </div>
+                        @error('gender')
+                            <span class="input-error">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date_of_birth">Tanggal Lahir <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="date" 
+                                id="date_of_birth" 
+                                name="date_of_birth" 
+                                value="{{ old('date_of_birth') }}"
+                                class="{{ $errors->has('date_of_birth') ? 'error' : '' }}"
+                                required
+                            >
+                        </div>
+                        @error('date_of_birth')
+                            <span class="input-error">{{ $message }}</span>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            placeholder="nama@email.com"
+                            value="{{ old('email') }}"
+                            class="{{ $errors->has('email') ? 'error' : '' }}"
+                            required
+                        >
+                    </div>
+                    @error('email')
+                        <span class="input-error">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Alamat <span class="required">*</span></label>
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="address" 
+                            name="address" 
+                            placeholder="Masukkan alamat lengkap"
+                            class="{{ $errors->has('address') ? 'error' : '' }}"
+                            required
+                        >{{ old('address') }}</textarea>
+                    </div>
+                    @error('address')
+                        <span class="input-error">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <button type="submit" class="btn-submit">✅ Buat Profil</button>
+            </form>
+
+            <div class="logout-link">
+                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                    @csrf
+                    <button type="submit" style="background: none; border: none; color: #667eea; cursor: pointer; font-weight: 600; font-size: 14px;">
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @push('scripts')
+    <script>
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const preview = document.getElementById('imagePreview');
+                preview.src = reader.result;
+            }
+            if (event.target.files[0]) {
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        }
+    </script>
+    @endpush
+</x-layout.app>
