@@ -225,9 +225,12 @@
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <div class="input-wrapper">
-                    <input type="password" id="password" name="password" placeholder="Masukkan password" required>
-                </div>
+                <x-password-input 
+                    id="password" 
+                    name="password" 
+                    placeholder="Masukkan password"
+                    required
+                />
             </div>
 
             <div class="forgot-password">

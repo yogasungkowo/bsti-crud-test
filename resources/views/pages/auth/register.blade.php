@@ -348,10 +348,13 @@
 
             <div class="form-group">
                 <label for="password">Password <span class="required">*</span></label>
-                <div class="input-wrapper">
-                    <input type="password" id="password" name="password" placeholder="Minimal 8 karakter"
-                        class="{{ $errors->has('password') ? 'error' : '' }}" required>
-                </div>
+                <x-password-input 
+                    id="password" 
+                    name="password" 
+                    placeholder="Minimal 8 karakter"
+                    :error="$errors->has('password')"
+                    required
+                />
                 <div class="password-strength" id="passwordStrength" style="display: none;">
                     <div class="strength-bar">
                         <div class="strength-bar-fill" id="strengthBar"></div>
@@ -365,10 +368,12 @@
 
             <div class="form-group">
                 <label for="password_confirmation">Konfirmasi Password <span class="required">*</span></label>
-                <div class="input-wrapper">
-                    <input type="password" id="password_confirmation" name="password_confirmation"
-                        placeholder="Masukkan ulang password" required>
-                </div>
+                <x-password-input 
+                    id="password_confirmation" 
+                    name="password_confirmation" 
+                    placeholder="Masukkan ulang password"
+                    required
+                />
             </div>
 
             <div class="checkbox-group">
