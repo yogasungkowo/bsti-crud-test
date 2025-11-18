@@ -21,14 +21,17 @@ Aplikasi manajemen data siswa berbasis Laravel 11 dengan fitur CRUD lengkap, aut
 - ✅ Dashboard dengan statistik lengkap
 - ✅ Kelola data user (Create, Read, Update, Delete)
 - ✅ Kelola data siswa dengan foto profil
+- ✅ Tambah siswa baru (create user + student sekaligus)
 - ✅ Upload foto profil ke DigitalOcean Spaces
 - ✅ Assign role (Admin/Student) ke user
+- ✅ Auto-create student profile saat create user dengan role student
 - ✅ Pagination & search functionality
 
 ### 👨‍🎓 Student
 - ✅ Lihat profil pribadi
 - ✅ Edit profil & upload foto
 - ✅ Update informasi personal (NISN, tanggal lahir, alamat, dll)
+- ✅ Auto-create profile saat login pertama kali
 - ✅ Dashboard siswa
 
 ### 🔐 Autentikasi
@@ -37,6 +40,7 @@ Aplikasi manajemen data siswa berbasis Laravel 11 dengan fitur CRUD lengkap, aut
 - ✅ Role-based access control (Spatie Permission)
 - ✅ Password reveal/hide icon
 - ✅ Email verification ready
+- ✅ Client-side validation dengan Validator.js
 
 ---
 
@@ -47,9 +51,10 @@ Aplikasi manajemen data siswa berbasis Laravel 11 dengan fitur CRUD lengkap, aut
 - **Authentication**: Laravel Breeze + Spatie Permission
 - **Storage**: DigitalOcean Spaces (S3-compatible)
 - **Frontend**: Blade Templates, Vanilla JavaScript
-- **Validation**: Validator.js
+- **Validation**: Validator.js (Client-side)
 - **Testing**: Pest PHP
 - **Package Manager**: Composer, NPM
+- **Icons**: SVG Icons (Feather Icons style)
 
 ---
 
@@ -245,15 +250,15 @@ npm run build
 |--------|------|-------------|
 | id | bigint | Primary key |
 | user_id | bigint | Foreign key ke users |
-| name | varchar | Nama siswa |
 | nisn | varchar | NISN (unique, nullable) |
-| email | varchar | Email siswa |
 | gender | enum | male/female |
 | date_of_birth | date | Tanggal lahir |
 | address | text | Alamat lengkap |
 | profile_picture | varchar | Path foto profil |
 | created_at | timestamp | Waktu dibuat |
 | updated_at | timestamp | Waktu diupdate |
+
+**Note:** `name` dan `email` siswa diambil dari relasi `user`, tidak disimpan duplikat di tabel students.
 
 ### Tabel: `roles` & `permissions`
 Menggunakan Spatie Laravel Permission dengan 2 role:
@@ -274,20 +279,26 @@ Menggunakan Spatie Laravel Permission dengan 2 role:
 ### Admin Routes (Middleware: auth, role:admin)
 - `GET /admin/dashboard` - Dashboard admin
 - `GET /admin/users` - Daftar user
+- `GET /admin/users/create` - Form tambah user
 - `POST /admin/users` - Tambah user
+- `GET /admin/users/{id}/edit` - Form edit user
 - `PUT /admin/users/{id}` - Update user
 - `DELETE /admin/users/{id}` - Hapus user
 - `GET /admin/students` - Daftar siswa
+- `GET /admin/students/create` - Form tambah siswa (dengan user)
+- `POST /admin/students` - Tambah siswa (dengan user)
 - `GET /admin/students/{id}` - Detail siswa
 - `GET /admin/students/{id}/edit` - Form edit siswa
 - `PUT /admin/students/{id}` - Update siswa
 - `DELETE /admin/students/{id}` - Hapus siswa
 
 ### Student Routes (Middleware: auth, role:student)
-- `GET /student` - Dashboard siswa
-- `GET /student/edit` - Form edit profil
-- `PUT /student` - Update profil
-- `DELETE /student` - Hapus profil
+- `GET /student/dashboard` - Dashboard siswa
+- `GET /student/profile/create` - Form create profil
+- `POST /student/profile` - Create profil
+- `GET /student/profile/{id}/edit` - Form edit profil
+- `PUT /student/profile/{id}` - Update profil
+- `DELETE /student/profile/{id}` - Hapus profil
 
 ---
 
@@ -326,7 +337,33 @@ Untuk production:
 6. ✅ Setup proper CORS di Spaces
 7. ✅ Encrypt sensitive data
 
-### 🔧 Troubleshooting
+### � Relasi User & Student
+- Setiap **Student** harus memiliki **User** (`user_id` foreign key)
+- `name` dan `email` siswa diambil dari tabel `users` via relasi
+- Saat create user dengan role **student**, otomatis create record di tabel `students`
+- Saat student login pertama kali, jika belum ada record student, akan auto-create
+- Student model menggunakan **Accessor** untuk `name` dan `email`:
+  ```php
+  $student->name  // Ambil dari $student->user->name
+  $student->email // Ambil dari $student->user->email
+  ```
+
+### 💡 Cara Menambahkan Siswa Baru
+
+#### Opsi 1: Via "Kelola User"
+1. Buka **Kelola User** → **Tambah User Baru**
+2. Isi nama, email, password, pilih role **Student**
+3. Submit → User dibuat + Student profile auto-created (data default)
+4. Student muncul di **Daftar Siswa** (data masih kosong)
+5. Edit detail siswa melalui **Daftar Siswa** → **Edit**
+
+#### Opsi 2: Via "Daftar Siswa" (Lengkap)
+1. Buka **Daftar Siswa** → **Tambah Siswa Baru**
+2. Isi data user (nama, email, password)
+3. Isi data siswa (NISN, gender, tanggal lahir, alamat, foto)
+4. Submit → User + Student dibuat sekaligus dengan data lengkap
+
+### �🔧 Troubleshooting
 
 **Upload tidak berfungsi?**
 ```bash
@@ -351,6 +388,20 @@ chown -R www-data:www-data storage bootstrap/cache
 ```bash
 # Fresh migrate dengan seed ulang
 php artisan migrate:fresh --seed
+```
+
+**User student tidak muncul di daftar siswa?**
+```bash
+# Pastikan user dengan role student sudah punya record di tabel students
+# Jika belum, akan auto-create saat login atau bisa manual create
+```
+
+**Error saat akses $student->name atau $student->email?**
+```bash
+# Pastikan relasi 'user' sudah di-load
+$student->load('user');
+# Atau gunakan eager loading
+$students = Student::with('user')->get();
 ```
 
 ---

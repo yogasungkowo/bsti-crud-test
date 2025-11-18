@@ -10,14 +10,24 @@ class Student extends Model
 {
     protected $fillable = [
         'user_id',
-        'name',
         'nisn',
         'gender',
-        'email',
         'date_of_birth',
         'address',
         'profile_picture',
     ];
+
+    // Accessor untuk name (dari user)
+    public function getNameAttribute()
+    {
+        return $this->user ? $this->user->name : 'Unknown';
+    }
+
+    // Accessor untuk email (dari user)
+    public function getEmailAttribute()
+    {
+        return $this->user ? $this->user->email : null;
+    }
 
     public function getProfilePictureUrlAttribute()
     {
@@ -33,8 +43,9 @@ class Student extends Model
             }
         }
         
-        // Default avatar if no profile picture
-        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&size=200&background=667eea&color=fff';
+        // Default avatar if no profile picture - use user name
+        $userName = $this->user ? $this->user->name : 'Student';
+        return 'https://ui-avatars.com/api/?name=' . urlencode($userName) . '&size=200&background=667eea&color=fff';
     }
 
     public function user()

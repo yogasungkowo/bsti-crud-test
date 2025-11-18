@@ -15,12 +15,10 @@ class StudentController extends Controller
         $user = Auth::user();
         $student = $user->student;
         
-        // Auto-create student profile with user data
+        // Auto-create student profile if not exists
         if (!$student) {
             $student = Student::create([
                 'user_id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
                 'nisn' => null, 
                 'gender' => null, 
                 'date_of_birth' => null, 
@@ -43,21 +41,16 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
             'nisn' => 'required|string|unique:students,nisn|max:255',
             'gender' => 'required|in:laki-laki,perempuan',
-            'email' => 'required|email|unique:students,email',
             'date_of_birth' => 'required|date',
             'address' => 'required|string',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ],
         [
-            'name.required' => 'Nama harus diisi.',
             'nisn.unique' => 'NISN sudah terdaftar.',
-            'email.unique' => 'Email sudah terdaftar.',
             'gender.in' => 'Jenis kelamin harus laki-laki atau perempuan.',
             'nisn.required' => 'NISN harus diisi.',
-            'email.required' => 'Email harus diisi.',
             'date_of_birth.required' => 'Tanggal lahir harus diisi.',
             'address.required' => 'Alamat harus diisi.',
             'profile_picture.image' => 'File harus berupa gambar.',
@@ -103,22 +96,16 @@ class StudentController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
             'nisn' => 'required|string|max:255|unique:students,nisn,' . $student->id,
             'gender' => 'required|in:laki-laki,perempuan',
-            'email' => 'required|email|unique:students,email,' . $student->id,
             'date_of_birth' => 'required|date',
             'address' => 'required|string',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]
-        ,
+        ],
         [
-            'name.required' => 'Nama harus diisi.',
             'nisn.unique' => 'NISN sudah terdaftar.',
-            'email.unique' => 'Email sudah terdaftar.',
             'gender.in' => 'Jenis kelamin harus laki-laki atau perempuan.',
             'nisn.required' => 'NISN harus diisi.',
-            'email.required' => 'Email harus diisi.',
             'date_of_birth.required' => 'Tanggal lahir harus diisi.',
             'address.required' => 'Alamat harus diisi.',
             'profile_picture.image' => 'File harus berupa gambar.',

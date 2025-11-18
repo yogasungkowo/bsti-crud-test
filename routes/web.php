@@ -41,6 +41,8 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     // Student Management
     Route::prefix('students')->group(function () {
         Route::get('/', [App\Http\Controllers\AdminController::class, 'students'])->name('admin.students');
+        Route::get('/create', [App\Http\Controllers\AdminController::class, 'createStudent'])->name('admin.students.create');
+        Route::post('/', [App\Http\Controllers\AdminController::class, 'storeStudent'])->name('admin.students.store');
         Route::get('/{student}', [App\Http\Controllers\AdminController::class, 'showStudent'])->name('admin.students.show');
         Route::get('/{student}/edit', [App\Http\Controllers\AdminController::class, 'editStudent'])->name('admin.students.edit');
         Route::put('/{student}', [App\Http\Controllers\AdminController::class, 'updateStudent'])->name('admin.students.update');

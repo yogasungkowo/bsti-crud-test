@@ -92,17 +92,32 @@
         }
 
         .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 30px;
         }
 
         .page-header h2 {
             font-size: 28px;
             color: #333;
-            margin-bottom: 10px;
         }
 
-        .page-header p {
-            color: #666;
+        .btn-add {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
         .card {
@@ -268,6 +283,17 @@
                 padding: 0 20px;
             }
 
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .btn-add {
+                width: 100%;
+                text-align: center;
+            }
+
             .pagination {
                 gap: 4px;
             }
@@ -329,7 +355,9 @@
 
         <div class="page-header">
             <h2>Daftar Siswa</h2>
-            <p>Kelola data profil siswa yang terdaftar</p>
+            <a href="{{ route('admin.students.create') }}" class="btn-add">
+                + Tambah Siswa Baru
+            </a>
         </div>
 
         <div class="card">
