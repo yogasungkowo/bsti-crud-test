@@ -1,6 +1,8 @@
 # 🎓 BSTI Student Management System
 
-Aplikasi manajemen data siswa berbasis Laravel 11 dengan fitur CRUD lengkap, autentikasi berbasis role (Admin & Student), dan integrasi DigitalOcean Spaces untuk penyimpanan file.
+Aplikasi manajemen data siswa berbasis Laravel 12 dengan fitur CRUD lengkap, autentikasi custom berbasis role (Admin & Student), dan integrasi DigitalOcean Spaces untuk penyimpanan file.
+
+---
 
 ## 📋 Daftar Isi
 
@@ -12,6 +14,7 @@ Aplikasi manajemen data siswa berbasis Laravel 11 dengan fitur CRUD lengkap, aut
 - [Menjalankan Aplikasi](#-menjalankan-aplikasi)
 - [Struktur Database](#-struktur-database)
 - [Endpoint & Routes](#-endpoint--routes)
+- [Komponen & Struktur Project](#-komponen--struktur-project)
 
 ---
 
@@ -36,25 +39,38 @@ Aplikasi manajemen data siswa berbasis Laravel 11 dengan fitur CRUD lengkap, aut
 
 ### 🔐 Autentikasi
 - ✅ Register & Login dengan validasi
-- ✅ Password strength indicator
+- ✅ Register otomatis assign role "student"
+- ✅ Password strength indicator (weak, medium, strong)
 - ✅ Role-based access control (Spatie Permission)
-- ✅ Password reveal/hide icon
+- ✅ Password reveal/hide icon component
 - ✅ Email verification ready
 - ✅ Client-side validation dengan Validator.js
+- ✅ Redirect otomatis berdasarkan role (admin/student)
+
+### 🎨 UI/UX
+- ✅ Custom pagination view (compact 36px buttons)
+- ✅ Responsive design (mobile-first)
+- ✅ Modern gradient backgrounds
+- ✅ Smooth animations & transitions
+- ✅ Image preview saat upload
+- ✅ Default avatar dengan UI-Avatars.com
+- ✅ Blade components (Layout, Password Input)
 
 ---
 
 ## 🛠 Teknologi yang Digunakan
 
-- **Framework**: Laravel 11
+- **Framework**: Laravel 12
 - **Database**: MySQL
-- **Authentication**: Laravel Breeze + Spatie Permission
+- **Authentication**: Custom Auth dengan Spatie Permission
 - **Storage**: DigitalOcean Spaces (S3-compatible)
-- **Frontend**: Blade Templates, Vanilla JavaScript
-- **Validation**: Validator.js (Client-side)
+- **Frontend**: Blade Templates, Vanilla JavaScript, Inline CSS
+- **Validation**: Validator.js via CDN (Client-side), Laravel Validation (Server-side)
 - **Testing**: Pest PHP
 - **Package Manager**: Composer, NPM
 - **Icons**: SVG Icons (Feather Icons style)
+- **Build Tool**: Vite
+- **UI Components**: Custom Blade Components
 
 ---
 
@@ -307,19 +323,26 @@ Menggunakan Spatie Laravel Permission dengan 2 role:
 ### PHP (Composer)
 ```json
 {
-    "laravel/framework": "^11.0",
-    "spatie/laravel-permission": "^6.0",
-    "league/flysystem-aws-s3-v3": "^3.0"
+    "laravel/framework": "^12.0",
+    "spatie/laravel-permission": "^6.23",
+    "league/flysystem-aws-s3-v3": "^3.30"
 }
 ```
 
 ### JavaScript (NPM)
 ```json
 {
-    "validator": "^13.11.0",
-    "vite": "^5.0"
+    "tailwindcss": "^4.0.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "vite": "^7.0.7",
+    "axios": "^1.11.0"
 }
 ```
+
+**Note:** 
+- Validator.js di-load via CDN (`unpkg.com`) di `appLogin.blade.php`
+- Tailwind CSS terinstall tapi tidak digunakan (styling menggunakan inline CSS)
+- Blade Components: `<x-layout.app>`, `<x-layout.appLogin>`, `<x-password-input>`
 
 ---
 
@@ -406,7 +429,68 @@ $students = Student::with('user')->get();
 
 ---
 
-## 👨‍💻 Developer
+## 🧩 Komponen & Struktur Project
+
+### Blade Components
+```
+resources/views/components/
+├── layout/
+│   ├── app.blade.php          # Layout utama untuk authenticated pages
+│   └── appLogin.blade.php     # Layout untuk login/register pages
+└── password-input.blade.php    # Reusable password input dengan reveal icon
+```
+
+### Views Structure
+```
+resources/views/
+├── pages/
+│   ├── admin/
+│   │   ├── index.blade.php           # Dashboard admin
+│   │   ├── users/
+│   │   │   ├── index.blade.php       # Daftar user
+│   │   │   ├── create.blade.php      # Form tambah user
+│   │   │   └── edit.blade.php        # Form edit user
+│   │   └── students/
+│   │       ├── index.blade.php       # Daftar siswa
+│   │       ├── create.blade.php      # Form tambah siswa (dengan user)
+│   │       ├── show.blade.php        # Detail siswa
+│   │       └── edit.blade.php        # Form edit siswa
+│   ├── student/
+│   │   ├── index.blade.php           # Dashboard & profil siswa
+│   │   ├── create.blade.php          # Form create profil (unused)
+│   │   └── edit.blade.php            # Form edit profil siswa
+│   └── auth/
+│       ├── login.blade.php           # Halaman login
+│       └── register.blade.php        # Halaman register
+├── vendor/
+│   └── pagination/
+│       └── default.blade.php         # Custom pagination view
+└── welcome.blade.php                 # Landing page
+```
+
+### Controllers
+```
+app/Http/Controllers/
+├── AuthController.php         # Handle login, register, logout
+├── AdminController.php        # Handle admin operations (users & students)
+└── StudentController.php      # Handle student self-service operations
+```
+
+### Models
+```
+app/Models/
+├── User.php                   # User model (Spatie Permission)
+└── Student.php               # Student model dengan accessor name & email
+```
+
+### Key Features Implementation
+- **Auto-create Student**: Saat user dengan role student dibuat/login, otomatis create record di tabel students
+- **Accessor Pattern**: `$student->name` dan `$student->email` mengambil dari `$student->user`
+- **Custom Pagination**: 36px compact buttons dengan purple gradient
+- **DigitalOcean Spaces**: Upload via `Storage::disk('spaces')->putFileAs()`
+- **Password Component**: `<x-password-input>` dengan SVG eye icons
+
+---
 
 **Prayoga Sungkowo**
 - Email: prayogasungkowo12@gmail.com
