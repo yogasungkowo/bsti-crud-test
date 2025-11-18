@@ -301,11 +301,7 @@
 
                 <!-- Profile Picture Preview -->
                 <div class="profile-picture-preview">
-                    @if($student->profile_picture)
-                        <img src="{{ asset('storage/' . $student->profile_picture) }}" alt="Profile" class="preview-image" id="imagePreview">
-                    @else
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($student->name) }}&size=150&background=random" alt="Profile" class="preview-image" id="imagePreview">
-                    @endif
+                    <img src="{{ $student->profile_picture_url }}" alt="Profile" class="preview-image" id="imagePreview">
                     
                     <div class="file-input-wrapper">
                         <input type="file" id="profile_picture" name="profile_picture" accept="image/*" onchange="previewImage(event)">

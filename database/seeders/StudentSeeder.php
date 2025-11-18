@@ -18,9 +18,9 @@ class StudentSeeder extends Seeder
         $studentsData = [
             [
                 'nisn' => '0012345678',
-                'name' => 'Ahmad Rizki Pratama',
-                'email' => 'ahmad.rizki@student.com',
-                'date_of_birth' => '2005-03-15',
+                'name' => 'Prayoga Sungkowo',
+                'email' => 'prayoga.sungkowo@student.com',
+                'date_of_birth' => '2002-11-21',
                 'gender' => 'laki-laki',
                 'address' => 'Jl. Merdeka No. 123, Jakarta Pusat',
             ],

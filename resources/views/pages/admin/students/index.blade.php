@@ -350,11 +350,7 @@
                         @foreach($students as $student)
                         <tr>
                             <td>
-                                @if($student->profile_picture)
-                                    <img src="{{ asset('storage/' . $student->profile_picture) }}" alt="Profile" class="profile-img">
-                                @else
-                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($student->name) }}&size=40" alt="Profile" class="profile-img">
-                                @endif
+                                <img src="{{ $student->profile_picture_url }}" alt="Profile" class="profile-img">
                             </td>
                             <td>{{ $student->name }}</td>
                             <td>{{ $student->nisn ?: '-' }}</td>

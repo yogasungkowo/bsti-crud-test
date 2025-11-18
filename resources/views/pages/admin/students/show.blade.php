@@ -240,11 +240,7 @@
             <!-- Profile Header -->
             <div class="profile-header">
                 <div class="profile-picture-wrapper">
-                    @if($student->profile_picture)
-                        <img src="{{ asset('storage/' . $student->profile_picture) }}" alt="Profile Picture" class="profile-picture">
-                    @else
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($student->name) }}&size=150&background=random" alt="Profile Picture" class="profile-picture">
-                    @endif
+                    <img src="{{ $student->profile_picture_url }}" alt="Profile Picture" class="profile-picture">
                 </div>
                 <h2>{{ $student->name }}</h2>
                 <p class="nisn">NISN: {{ $student->nisn ?: '-' }}</p>

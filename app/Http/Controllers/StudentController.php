@@ -68,8 +68,15 @@ class StudentController extends Controller
         $validated['user_id'] = Auth::id();
 
         if ($request->hasFile('profile_picture')) {
-            $validated['profile_picture'] = $request->file('profile_picture')
-                ->store('profile-pictures', 'public');
+            // Upload picture to Spaces
+            $file = $request->file('profile_picture');
+            $path = Storage::disk('spaces')->putFileAs(
+                'profile-pictures',
+                $file,
+                time() . '_' . $file->hashName(),
+                'public'
+            );
+            $validated['profile_picture'] = $path;
         }
 
         Student::create($validated);
@@ -119,14 +126,21 @@ class StudentController extends Controller
             'profile_picture.max' => 'Ukuran gambar maksimal 2MB.',
         ]);
 
-        // Delete old profile picture if exists
+        // Delete old profile picture if exists and upload new one to Spaces
         if ($request->hasFile('profile_picture')) {
             if ($student->profile_picture) {
-                Storage::disk('public')->delete($student->profile_picture);
+                Storage::disk('spaces')->delete($student->profile_picture);
             }
 
-            $validated['profile_picture'] = $request->file('profile_picture')
-                ->store('profile-pictures', 'public');
+            // Upload gambar baru ke Spaces
+            $file = $request->file('profile_picture');
+            $path = Storage::disk('spaces')->putFileAs(
+                'profile-pictures',
+                $file,
+                time() . '_' . $file->hashName(),
+                'public'
+            );
+            $validated['profile_picture'] = $path;
         }
 
         $student->update($validated);
@@ -142,8 +156,9 @@ class StudentController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+        // Delete profile picture from Spaces if exists
         if ($student->profile_picture) {
-            Storage::disk('public')->delete($student->profile_picture);
+            Storage::disk('spaces')->delete($student->profile_picture);
         }
 
         // Reset student data to basic user data, keeping name and email from user

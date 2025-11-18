@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Student extends Model
 {
@@ -20,7 +21,22 @@ class Student extends Model
 
     public function getProfilePictureUrlAttribute()
     {
-        return $this->profile_picture ? asset('storage/' . $this->profile_picture) : asset('images/default-profile.png');
+        if ($this->profile_picture) {
+            // Cek apakah menggunakan Spaces
+            $awsUrl = config('filesystems.disks.spaces.url');
+            if ($awsUrl) {
+                // Generate URL dari Spaces
+                return $awsUrl . '/' . $this->profile_picture;
+            }
+            
+            // Fallback ke storage lokal jika ada
+            if (Storage::disk('public')->exists($this->profile_picture)) {
+                return asset('storage/' . $this->profile_picture);
+            }
+        }
+        
+        // Default avatar jika tidak ada gambar
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&size=200&background=667eea&color=fff';
     }
 
     public function user()

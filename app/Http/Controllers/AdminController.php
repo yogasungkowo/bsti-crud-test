@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Student;
+use App\Models\User;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -27,6 +26,7 @@ class AdminController extends Controller
     public function users()
     {
         $users = User::with('student')->latest()->paginate(10);
+
         return view('pages.admin.users.index', compact('users'));
     }
 
@@ -66,7 +66,7 @@ class AdminController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => 'required|email|unique:users,email,'.$user->id,
             'role' => 'required|in:admin,student',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
@@ -74,7 +74,7 @@ class AdminController extends Controller
         $user->name = $validated['name'];
         $user->email = $validated['email'];
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
         }
 
@@ -105,18 +105,21 @@ class AdminController extends Controller
     public function students()
     {
         $students = Student::with('user')->latest()->paginate(10);
+
         return view('pages.admin.students.index', compact('students'));
     }
 
     public function showStudent(Student $student)
     {
         $student->load('user');
+
         return view('pages.admin.students.show', compact('student'));
     }
 
     public function editStudent(Student $student)
     {
         $student->load('user');
+
         return view('pages.admin.students.edit', compact('student'));
     }
 
@@ -124,21 +127,33 @@ class AdminController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'nisn' => 'required|string|max:255|unique:students,nisn,' . $student->id,
+            'nisn' => 'required|string|max:255|unique:students,nisn,'.$student->id,
             'gender' => 'required|in:laki-laki,perempuan',
-            'email' => 'required|email|unique:students,email,' . $student->id,
+            'email' => 'required|email|unique:students,email,'.$student->id,
             'date_of_birth' => 'required|date',
             'address' => 'required|string',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         if ($request->hasFile('profile_picture')) {
+
+            // Delete old file
             if ($student->profile_picture) {
-                Storage::disk('public')->delete($student->profile_picture);
+                Storage::disk('spaces')->delete($student->profile_picture);
             }
 
-            $validated['profile_picture'] = $request->file('profile_picture')
-                ->store('profile-pictures', 'public');
+            $file = $request->file('profile_picture');
+            $filename = time().'_'.$file->hashName();
+
+            // Upload ke folder profile-pictures
+            $path = Storage::disk('spaces')->putFileAs(
+                'profile-pictures',
+                $file,
+                $filename,
+                ['visibility' => 'public']
+            );
+
+            $validated['profile_picture'] = $path;
         }
 
         $student->update($validated);
@@ -149,8 +164,9 @@ class AdminController extends Controller
 
     public function destroyStudent(Student $student)
     {
+        // Delete profile picture from Spaces if exists
         if ($student->profile_picture) {
-            Storage::disk('public')->delete($student->profile_picture);
+            Storage::disk('spaces')->delete($student->profile_picture);
         }
 
         $student->delete();

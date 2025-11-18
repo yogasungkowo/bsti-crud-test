@@ -31,8 +31,8 @@ class UserSeeder extends Seeder
         // Create 10 Student Users
         $students = [
             [
-                'name' => 'Ahmad Rizki Pratama',
-                'email' => 'ahmad.rizki@student.com',
+                'name' => 'Prayoga Sungkowo',
+                'email' => 'prayoga.sungkowo@student.com',
             ],
             [
                 'name' => 'Siti Nurhaliza',
@@ -96,7 +96,7 @@ class UserSeeder extends Seeder
             User::create([
                 'name' => $studentData['name'],
                 'email' => $studentData['email'],
-                'password' => Hash::make('password'),
+                'password' => bcrypt('password'),
                 'email_verified_at' => now(),
             ])->assignRole('student');
         }
