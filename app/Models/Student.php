@@ -22,20 +22,18 @@ class Student extends Model
     public function getProfilePictureUrlAttribute()
     {
         if ($this->profile_picture) {
-            // Cek apakah menggunakan Spaces
             $awsUrl = config('filesystems.disks.spaces.url');
             if ($awsUrl) {
-                // Generate URL dari Spaces
                 return $awsUrl . '/' . $this->profile_picture;
             }
             
-            // Fallback ke storage lokal jika ada
+            // Fallback to local storage if available
             if (Storage::disk('public')->exists($this->profile_picture)) {
                 return asset('storage/' . $this->profile_picture);
             }
         }
         
-        // Default avatar jika tidak ada gambar
+        // Default avatar if no profile picture
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&size=200&background=667eea&color=fff';
     }
 
